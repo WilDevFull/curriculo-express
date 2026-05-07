@@ -1,0 +1,89 @@
+-- 0. Limpeza (Apaga as tabelas se elas já existirem para recriar do zero)
+DROP TABLE IF EXISTS hard_skills CASCADE;
+DROP TABLE IF EXISTS experiencia_profissional CASCADE;
+DROP TABLE IF EXISTS formacao_academica CASCADE;
+DROP TABLE IF EXISTS soft_skills CASCADE;
+DROP TABLE IF EXISTS candidato CASCADE;
+
+-- 1. Criação das Tabelas
+CREATE TABLE candidato (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(150) NOT NULL,
+    endereco VARCHAR(255),
+    nacionalidade_estado_civil VARCHAR(100),
+    idade INT,
+    cnh VARCHAR(10),
+    linkedin VARCHAR(255),
+    objetivo TEXT,
+    telefone1 VARCHAR(20),
+    telefone2 VARCHAR(20),
+    email VARCHAR(100)
+);
+
+CREATE TABLE soft_skills (
+    id SERIAL PRIMARY KEY,
+    candidato_id INT REFERENCES candidato(id) ON DELETE CASCADE,
+    habilidade VARCHAR(150) NOT NULL
+);
+
+CREATE TABLE formacao_academica (
+    id SERIAL PRIMARY KEY,
+    candidato_id INT REFERENCES candidato(id) ON DELETE CASCADE,
+    curso VARCHAR(150) NOT NULL,
+    instituicao VARCHAR(150),
+    periodo VARCHAR(50)
+);
+
+CREATE TABLE experiencia_profissional (
+    id SERIAL PRIMARY KEY,
+    candidato_id INT REFERENCES candidato(id) ON DELETE CASCADE,
+    empresa VARCHAR(150) NOT NULL,
+    cargo VARCHAR(150) NOT NULL,
+    duracao_periodo VARCHAR(100)
+);
+
+CREATE TABLE hard_skills (
+    id SERIAL PRIMARY KEY,
+    candidato_id INT REFERENCES candidato(id) ON DELETE CASCADE,
+    curso_habilidade VARCHAR(200) NOT NULL,
+    instituicao VARCHAR(150),
+    carga_horaria VARCHAR(50),
+    data_conclusao VARCHAR(100)
+);
+
+-- 2. Inserção dos Dados do Currículo
+INSERT INTO candidato (nome, endereco, nacionalidade_estado_civil, idade, cnh, linkedin, objetivo, telefone1, telefone2, email)
+VALUES (
+    'Wilson Pereira De Lima Filho', 
+    'Alto Santa Terezinha, Recife-PE', 
+    'Brasileiro Solteiro', 
+    22, 
+    'A e B', 
+    'https://www.linkedin.com/in/wilson-pereira-a9539528b/', 
+    'Atuar em uma função administrativa ou de tecnologia', 
+    '81 987067545', 
+    '81 988074648', 
+    'wilsonfilho425@gmail.com'
+);
+
+INSERT INTO soft_skills (candidato_id, habilidade) VALUES
+(1, 'Comunicação e negociação'),
+(1, 'Coordenação com pessoas'),
+(1, 'Organização e perfil analítico'),
+(1, 'Inteligência emocional'),
+(1, 'Criatividade e inovação');
+
+INSERT INTO formacao_academica (candidato_id, curso, instituicao, periodo)
+VALUES 
+(1, 'Sistemas Para Internet', 'Universidade Católica de Pernambuco', '4º Período');
+
+INSERT INTO experiencia_profissional (candidato_id, empresa, cargo, duracao_periodo) VALUES
+(1, 'Hospital Evangélico De Pernambuco', 'Auxiliar Administrativo / Jovem Aprendiz', '1 ano e 7 meses');
+
+INSERT INTO hard_skills (candidato_id, curso_habilidade, instituicao, carga_horaria, data_conclusao) VALUES
+(1, 'Gestão Empresarial com software ERP', 'Instituto Oportunidade Social', '300h/a', 'Dezembro/2024'),
+(1, 'Do Princípio da programação até o Full Stack', 'Dio.me', NULL, 'Janeiro/2025 - atualmente'),
+(1, 'Inglês do básico ao avançado (Inglês Avançado)', 'Alura Lingua', NULL, 'Janeiro/2025 - atualmente'),
+(1, 'Informática Nível intermediário', 'Prime cursos', '40 h/a', 'Outubro/2021'),
+(1, 'Montagem e Manutenção de Computadores Básico', NULL, NULL, NULL),
+(1, 'Lógica Da Programação', 'Escola Virtual - Fundação Bradesco', '15h/a', 'Novembro/2023');

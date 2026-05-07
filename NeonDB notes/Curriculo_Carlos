@@ -1,0 +1,89 @@
+-- 0. Limpeza (Apaga as tabelas se elas já existirem para recriar do zero e evitar erros)
+DROP TABLE IF EXISTS hard_skills CASCADE;
+DROP TABLE IF EXISTS experiencia_profissional CASCADE;
+DROP TABLE IF EXISTS formacao_academica CASCADE;
+DROP TABLE IF EXISTS soft_skills CASCADE;
+DROP TABLE IF EXISTS candidato CASCADE;
+
+-- 1. Criação das Tabelas
+CREATE TABLE candidato (
+    id SERIAL PRIMARY KEY,
+    nome VARCHAR(150) NOT NULL,
+    endereco VARCHAR(255),
+    nacionalidade_estado_civil VARCHAR(100),
+    idade INT,
+    cnh VARCHAR(10),
+    linkedin VARCHAR(255),
+    objetivo TEXT,
+    telefone1 VARCHAR(20),
+    telefone2 VARCHAR(20),
+    email VARCHAR(100)
+);
+
+CREATE TABLE soft_skills (
+    id SERIAL PRIMARY KEY,
+    candidato_id INT REFERENCES candidato(id) ON DELETE CASCADE,
+    habilidade VARCHAR(150) NOT NULL
+);
+
+CREATE TABLE formacao_academica (
+    id SERIAL PRIMARY KEY,
+    candidato_id INT REFERENCES candidato(id) ON DELETE CASCADE,
+    curso VARCHAR(150) NOT NULL,
+    instituicao VARCHAR(150),
+    periodo VARCHAR(50)
+);
+
+CREATE TABLE experiencia_profissional (
+    id SERIAL PRIMARY KEY,
+    candidato_id INT REFERENCES candidato(id) ON DELETE CASCADE,
+    empresa VARCHAR(150) NOT NULL,
+    cargo VARCHAR(150) NOT NULL,
+    duracao_periodo VARCHAR(100)
+);
+
+CREATE TABLE hard_skills (
+    id SERIAL PRIMARY KEY,
+    candidato_id INT REFERENCES candidato(id) ON DELETE CASCADE,
+    curso_habilidade VARCHAR(200) NOT NULL,
+    instituicao VARCHAR(150),
+    carga_horaria VARCHAR(50),
+    data_conclusao VARCHAR(100)
+);
+
+-- 2. Inserção dos Dados do Currículo Fictício
+INSERT INTO candidato (nome, endereco, nacionalidade_estado_civil, idade, cnh, linkedin, objetivo, telefone1, telefone2, email)
+VALUES (
+    'Carlos Eduardo de Souza', 
+    'Vila Mariana, São Paulo-SP', 
+    'Brasileiro Solteiro', 
+    24, 
+    'B', 
+    'https://www.linkedin.com/in/carlos-eduardo-ficticio/', 
+    'Atuar na área de Desenvolvimento de Software ou Análise de Dados.', 
+    '11 98765-4321', 
+    '11 91234-5678', 
+    'carloseduardo.dev@email.com'
+);
+
+INSERT INTO soft_skills (candidato_id, habilidade) VALUES
+(1, 'Resolução ágil de problemas'),
+(1, 'Trabalho em equipe e colaboração'),
+(1, 'Proatividade e foco em resultados'),
+(1, 'Gestão de tempo'),
+(1, 'Pensamento crítico');
+
+INSERT INTO formacao_academica (candidato_id, curso, instituicao, periodo)
+VALUES 
+(1, 'Análise e Desenvolvimento de Sistemas', 'Faculdade de Tecnologia de São Paulo (FATEC)', '5º Período');
+
+INSERT INTO experiencia_profissional (candidato_id, empresa, cargo, duracao_periodo) VALUES
+(1, 'Agência Tech Solutions', 'Desenvolvedor Júnior / Estagiário de TI', 'Desde Janeiro/2023');
+
+INSERT INTO hard_skills (candidato_id, curso_habilidade, instituicao, carga_horaria, data_conclusao) VALUES
+(1, 'Bootcamp Intensivo: Desenvolvimento Web Full Stack', 'Rocketseat', '400h/a', 'Novembro/2024'),
+(1, 'Arquitetura de Banco de Dados', 'Alura', NULL, 'Fevereiro/2025 - atualmente'),
+(1, 'Inglês Intermediário para Tecnologia', 'English Live', NULL, 'Setembro/2024 - atualmente'),
+(1, 'Informática Aplicada (Nível Avançado)', 'Senac', '60 h/a', 'Março/2023'),
+(1, 'Introdução à Ciência de Dados (Básico)', NULL, NULL, NULL),
+(1, 'Lógica de Programação com Python', 'Fundação Estudar', '20h/a', 'Agosto/2022');
