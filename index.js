@@ -2,60 +2,74 @@ const express = require('express');
 const pool = require('./db');
 require('dotenv').config();
 
+
+const candidatosRouter  = require('./routes/candidatos');
+const softSkillsRouter  = require('./routes/softSkills');
+const formacaoRouter    = require('./routes/formacao');
+const experienciaRouter = require('./routes/experiencia');
+const hardSkillsRouter  = require('./routes/hardSkills');
+
 const app = express();
 app.use(express.json());
 
-// Rota 1: Listar dados básicos de todos os candidatos
-app.get('/api/candidatos', async (req, res) => {
+
+app.use('/api/candidatos', candidatosRouter);
+
+
+app.use('/api/candidatos/:id/soft-skills',  softSkillsRouter);
+app.use('/api/candidatos/:id/formacao',     formacaoRouter);
+app.use('/api/candidatos/:id/experiencia',  experienciaRouter);
+app.use('/api/candidatos/:id/hard-skills',  hardSkillsRouter);
+
+
+app.use('/api/soft-skills',  softSkillsRouter);
+app.use('/api/formacao',     formacaoRouter);
+app.use('/api/experiencia',  experienciaRouter);
+app.use('/api/hard-skills',  hardSkillsRouter);
+
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, async () => {
+    console.log(`\n🚀 Servidor rodando na porta ${PORT}`);
+    console.log('──────────────────────────────────────────');
+    console.log('📋 CANDIDATOS');
+    console.log(`   GET    http://localhost:${PORT}/api/candidatos`);
+    console.log(`   GET    http://localhost:${PORT}/api/candidatos/:id/curriculo`);
+    console.log(`   POST   http://localhost:${PORT}/api/candidatos`);
+    console.log(`   PUT    http://localhost:${PORT}/api/candidatos/:id`);
+    console.log(`   DELETE http://localhost:${PORT}/api/candidatos/:id`);
+    console.log('──────────────────────────────────────────');
+    console.log('🧠 SOFT SKILLS');
+    console.log(`   GET    http://localhost:${PORT}/api/candidatos/:id/soft-skills`);
+    console.log(`   POST   http://localhost:${PORT}/api/candidatos/:id/soft-skills`);
+    console.log(`   PUT    http://localhost:${PORT}/api/soft-skills/:skillId`);
+    console.log(`   DELETE http://localhost:${PORT}/api/soft-skills/:skillId`);
+    console.log('──────────────────────────────────────────');
+    console.log('🎓 FORMAÇÃO ACADÊMICA');
+    console.log(`   GET    http://localhost:${PORT}/api/candidatos/:id/formacao`);
+    console.log(`   POST   http://localhost:${PORT}/api/candidatos/:id/formacao`);
+    console.log(`   PUT    http://localhost:${PORT}/api/formacao/:formacaoId`);
+    console.log(`   DELETE http://localhost:${PORT}/api/formacao/:formacaoId`);
+    console.log('──────────────────────────────────────────');
+    console.log('💼 EXPERIÊNCIA PROFISSIONAL');
+    console.log(`   GET    http://localhost:${PORT}/api/candidatos/:id/experiencia`);
+    console.log(`   POST   http://localhost:${PORT}/api/candidatos/:id/experiencia`);
+    console.log(`   PUT    http://localhost:${PORT}/api/experiencia/:expId`);
+    console.log(`   DELETE http://localhost:${PORT}/api/experiencia/:expId`);
+    console.log('──────────────────────────────────────────');
+    console.log('💡 HARD SKILLS');
+    console.log(`   GET    http://localhost:${PORT}/api/candidatos/:id/hard-skills`);
+    console.log(`   POST   http://localhost:${PORT}/api/candidatos/:id/hard-skills`);
+    console.log(`   PUT    http://localhost:${PORT}/api/hard-skills/:skillId`);
+    console.log(`   DELETE http://localhost:${PORT}/api/hard-skills/:skillId`);
+    console.log('──────────────────────────────────────────\n');
+
+    
     try {
-        const result = await pool.query('SELECT id, nome, email, objetivo FROM candidato');
-        res.json(result.rows);
+        await pool.query('SELECT 1');
+        console.log('✅ Conexão com o NeonDB estabelecida com sucesso!\n');
     } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ erro: 'Erro interno no servidor' });
+        console.error('❌ Erro ao conectar ao banco de dados:', err.message);
     }
-});
-
-// Rota 2: Obter o currículo completo de um candidato específico pelo ID
-app.get('/api/candidatos/:id/curriculo', async (req, res) => {
-    try {
-        const { id } = req.params;
-        
-        // Busca os dados principais
-        const candidatoRes = await pool.query('SELECT * FROM candidato WHERE id = $1', [id]);
-        
-        // Se o array voltar vazio, o candidato não existe
-        if (candidatoRes.rows.length === 0) {
-            return res.status(404).json({ mensagem: 'Candidato não encontrado' });
-        }
-        
-        // Busca os dados das tabelas relacionadas
-        const softSkillsRes = await pool.query('SELECT habilidade FROM soft_skills WHERE candidato_id = $1', [id]);
-        const formacaoRes = await pool.query('SELECT curso, instituicao, periodo FROM formacao_academica WHERE candidato_id = $1', [id]);
-        const expRes = await pool.query('SELECT empresa, cargo, duracao_periodo FROM experiencia_profissional WHERE candidato_id = $1', [id]);
-        const hardSkillsRes = await pool.query('SELECT curso_habilidade, instituicao, carga_horaria, data_conclusao FROM hard_skills WHERE candidato_id = $1', [id]);
-
-        // Monta o objeto final no formato JSON estruturado
-        const curriculoCompleto = {
-            dados_pessoais: candidatoRes.rows[0],
-            soft_skills: softSkillsRes.rows,
-            formacao_academica: formacaoRes.rows,
-            experiencia_profissional: expRes.rows,
-            hard_skills: hardSkillsRes.rows
-        };
-
-        // Envia a resposta
-        res.json(curriculoCompleto);
-    } catch (err) {
-        console.error(err.message);
-        res.status(500).json({ erro: 'Erro interno no servidor' });
-    }
-});
-
-// Inicializa o servidor
-const port = process.env.PORT || 3000;
-app.listen(port, () => {
-    console.log(`🚀 Servidor rodando na porta ${port}`);
-    console.log(`Testar rota geral: http://localhost:${port}/api/candidatos`);
-    console.log(`Testar rota específica: http://localhost:${port}/api/candidatos/1/curriculo`);
 });
